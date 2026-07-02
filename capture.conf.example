@@ -1,0 +1,45 @@
+# kick-live-capture configuration
+# Copy to capture.conf (same directory as the scripts) and edit.
+# chmod 600 capture.conf if you put notification tokens in it. Never commit it.
+
+# --- Target -------------------------------------------------------------------
+CHANNEL="somestreamer"            # kick.com/<CHANNEL>
+
+# --- Directories --------------------------------------------------------------
+STAGING_DIR="$HOME/kick_capture"  # captures land here first (fast local disk)
+LOG_DIR="$HOME/kick_capture/logs"
+STATE_DIR="$HOME/kick_capture/state"
+
+# --- Optional SOCKS5 proxy (fail-closed) ---------------------------------------
+# If set, ALL Kick traffic (polls + capture) egresses through this proxy, and every
+# script REFUSES to touch Kick while the proxy is unreachable — it never falls back
+# to your direct IP. Leave empty to connect directly.
+# Typical setup: an SSH dynamic tunnel to a VPS, e.g.
+#   autossh -M 0 -N -D 127.0.0.1:1080 my-vps
+#   PROXY_URL="socks5://localhost:1080"
+PROXY_URL=""
+
+# --- Capture tuning -------------------------------------------------------------
+YTDLP="yt-dlp"          # yt-dlp binary (needs curl_cffi for --impersonate)
+IMPERSONATE="chrome"    # impersonation target for Cloudflare's bot check
+MAX_WAIT=1500           # secs to wait for a (return) stream before the watcher exits
+RETRY_DELAY=5           # secs between retries after a mid-stream drop
+MAX_STREAM_AGE=108000   # hard cap on one watcher's lifetime (30 h; spans split streams)
+CRC_RENAME=1            # 1 = append a CRC32 to finished filenames (requires rhash)
+
+# --- Watchdog -------------------------------------------------------------------
+STALE_SECS=900          # no fresh heartbeat for this long (and no capture running) = alarm
+FAIL_THRESHOLD=3        # consecutive bad polls (timeouts / unparseable 200s) before paging
+
+# --- Optional delivery (rsync, verify-then-delete) -------------------------------
+# rsync destination for finished captures, e.g. "mediaserver:/mnt/media/kick".
+# Local files are deleted ONLY after a byte-level checksum verify against the remote
+# copy succeeds. Leave empty to just keep captures in STAGING_DIR.
+DELIVER_REMOTE=""
+
+# --- Notifications ----------------------------------------------------------------
+# Channel: none | pushover | ntfy
+NOTIFY_CHANNEL="none"
+PUSHOVER_APP_TOKEN=""
+PUSHOVER_USER_KEY=""
+NTFY_URL=""             # e.g. https://ntfy.sh/your-private-topic

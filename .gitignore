@@ -1,0 +1,10 @@
+# Local config holds notification tokens — never commit it.
+capture.conf
+
+# Runtime artifacts (if you point LOG_DIR/STATE_DIR/STAGING_DIR into the repo)
+logs/
+state/
+*.part
+*.ytdl
+__pycache__/
+*.pyc
